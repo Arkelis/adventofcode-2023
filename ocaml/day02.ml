@@ -16,17 +16,21 @@ let parse_line line =
     |> Re.compile
   in
   let result = Re.exec regex line in
-  (Re.Group.get result 1 |> Int.of_string, Re.Group.get result 2)
+  let game_id = Re.Group.get result 1 |> Int.of_string
+  and reveals = Re.Group.get result 2 in
+  (game_id, reveals)
 
-let tuples_from_group group =
+let tuples_from_reveal reveal =
   let regex =
     Re.seq
       [ Re.group (Re.rep1 Re.digit); Re.str " "; Re.group (Re.rep1 Re.alpha) ]
     |> Re.compile
   and to_tuple group =
-    (Re.Group.get group 1 |> Int.of_string, Re.Group.get group 2)
+    let number = Re.Group.get group 1 |> Int.of_string
+    and color = Re.Group.get group 2 in
+    (number, color)
   in
-  Re.all regex group |> List.map ~f:to_tuple
+  Re.all regex reveal |> List.map ~f:to_tuple
 
 let is_impossible_subset = function
   | n, "red" when n > 12 -> true
@@ -34,13 +38,14 @@ let is_impossible_subset = function
   | n, "blue" when n > 14 -> true
   | _ -> false
 
-let possible groups =
-    groups |> tuples_from_group |> List.exists ~f:is_impossible_subset |> not
-
-let possible_id (id, groups) = if possible groups then id else 0
+let possible_id (id, reveals) =
+  match reveals |> tuples_from_reveal |> List.exists ~f:is_impossible_subset with
+  | true -> Some id
+  | false -> None
 
 let part1 =
-  lines |> List.map ~f:parse_line |> List.map ~f:possible_id
+  lines |> List.map ~f:parse_line
+  |> List.filter_map ~f:possible_id
   |> List.reduce_exn ~f:( + )
 
 let get_cube_power cubes =
@@ -57,7 +62,7 @@ let get_cube_power cubes =
   in
   find_minimums cubes 0 0 0 |> List.reduce_exn ~f:( * )
 
-let power (_, group) = group |> tuples_from_group |> get_cube_power
+let power (_, reveal) = reveal |> tuples_from_reveal |> get_cube_power
 
 let part2 =
   lines |> List.map ~f:parse_line |> List.map ~f:power
