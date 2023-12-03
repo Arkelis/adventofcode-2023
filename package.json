@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@opam/base": "*",
+    "@opam/dune": "*",
+    "@opam/ocamlformat": "0.26.1",
+    "@opam/re": "1.11.0",
+    "@opam/stdio": "*",
+    "@opam/utop": "2.13.1",
+    "ocaml": "4.14.x"
+  }
+}
