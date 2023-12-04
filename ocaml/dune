@@ -1,3 +1,3 @@
 (executables
- (names day01 day02)
- (libraries base stdio common re str))
+ (names day01 day02 day03 day04)
+ (libraries base stdio common re))
